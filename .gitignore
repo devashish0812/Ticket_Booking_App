@@ -1,0 +1,35 @@
+# OS / Editor
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+.vscode/
+.idea/
+
+# Environment
+.env
+.env.local
+*.env
+
+# Go build
+bin/
+*.exe
+*.out
+*.test
+*.dll
+*.so
+*.dylib
+
+# React / Node
+node_modules/
+build/
+dist/
+.cache/
+coverage/
+
+# Dependency folders
+**/node_modules/
+**/vendor/
+
+# Misc
+*.swp
