@@ -11,8 +11,10 @@ import (
 )
 
 type MongoConfig struct {
-	Client  *mongo.Client
-	UserCol *mongo.Collection
+	Client    *mongo.Client
+	UserCol   *mongo.Collection
+	TokenCol  *mongo.Collection
+	JWTSecret string
 }
 
 func InitMongo() *MongoConfig {
@@ -38,9 +40,12 @@ func InitMongo() *MongoConfig {
 	// Pick DB and Collection
 	db := client.Database("ticketingtool")
 	col := db.Collection("users")
-
+	token := db.Collection("refresh_tokens")
+	JWTSecret := os.Getenv("JWT_SECRET")
 	return &MongoConfig{
-		Client:  client,
-		UserCol: col,
+		Client:    client,
+		UserCol:   col,
+		JWTSecret: JWTSecret,
+		TokenCol:  token,
 	}
 }
