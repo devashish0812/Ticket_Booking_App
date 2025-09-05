@@ -71,7 +71,7 @@ return (
         Don’t have an account?{" "}
         <button
           type="button"
-          onClick={() => navigate("/signup")}
+          onClick={() => navigate("/")}
           className="text-indigo-600 font-medium hover:underline"
         >
           Signup
