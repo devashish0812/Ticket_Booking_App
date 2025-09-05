@@ -15,9 +15,8 @@ export default function Login() {
 
     try {
   // 1) Login -> backend will SET cookies (access_token, refresh_token)
-    const USER_SERVICE_URL = process.env.REACT_APP_USER_SERVICE_URL;
     const API_GATEWAY_URL = process.env.REACT_APP_API_GATEWAY_URL;
-  await axios.post(`${USER_SERVICE_URL}/users/login`, form, {
+  await axios.post(`${API_GATEWAY_URL}/auth/login`, form, {
     withCredentials: true, // <-- send/receive cookies across origins
   });
 
@@ -33,38 +32,53 @@ export default function Login() {
     }
   };
 
-  return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-6 rounded-2xl shadow-md w-96"
+return (
+  <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600">
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md"
+    >
+      <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">
+        Welcome Back
+      </h2>
+
+      <input
+        type="text"
+        name="name"
+        placeholder="Name"
+        value={form.name}
+        onChange={handleChange}
+        className="w-full p-3 mb-4 border rounded-lg focus:ring-2 focus:ring-indigo-400"
+      />
+
+      <input
+        type="password"
+        name="password"
+        placeholder="Password"
+        value={form.password}
+        onChange={handleChange}
+        className="w-full p-3 mb-6 border rounded-lg focus:ring-2 focus:ring-indigo-400"
+      />
+
+      <button
+        type="submit"
+        className="w-full bg-indigo-600 text-white py-3 rounded-xl hover:bg-indigo-700 transition font-semibold"
       >
-        <h2 className="text-2xl font-semibold mb-4">Login</h2>
+        Login
+      </button>
 
-        <input
-          type="text"
-          name="name"
-          placeholder="Name"
-          value={form.name}
-          onChange={handleChange}
-          className="w-full p-2 mb-3 border rounded"
-        />
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={form.password}
-          onChange={handleChange}
-          className="w-full p-2 mb-4 border rounded"
-        />
-
+      <p className="text-center mt-4 text-gray-600">
+        Don’t have an account?{" "}
         <button
-          type="submit"
-          className="w-full bg-indigo-600 text-white py-2 rounded-xl hover:bg-indigo-700"
+          type="button"
+          onClick={() => navigate("/signup")}
+          className="text-indigo-600 font-medium hover:underline"
         >
-          Login
+          Signup
         </button>
-      </form>
-    </div>
-  );
+      </p>
+    </form>
+  </div>
+);
+
 }

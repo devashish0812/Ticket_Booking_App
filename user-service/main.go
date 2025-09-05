@@ -3,12 +3,11 @@ package main
 import (
 	"fmt"
 	"log"
-	"time"
+	"os"
 
 	"github.com/devashish0812/user-service/config"
 	"github.com/devashish0812/user-service/handlers"
 	"github.com/devashish0812/user-service/services"
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
@@ -33,14 +32,7 @@ func main() {
 
 	// 3) Routes
 	r := gin.Default()
-	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000"}, // React dev server
-		AllowMethods:     []string{"POST", "GET", "PUT", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
-		ExposeHeaders:    []string{"Content-Length"},
-		AllowCredentials: true,
-		MaxAge:           12 * time.Hour,
-	}))
+
 	users := r.Group("/users")
 	{
 		users.POST("/signup", userHandler.Signup)
@@ -48,7 +40,11 @@ func main() {
 	}
 	r.POST("/auth/refresh", authMiddleware.RequireAuth(), authHandler.GetRefreshToken)
 	// 4) Start
-	if err := r.Run(":8080"); err != nil {
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080" // fallback for local
+	}
+	if err := r.Run(":" + port); err != nil {
 		log.Fatal(err)
 	}
 }

@@ -32,10 +32,27 @@ func (h *LoginHandler) Login(c *gin.Context) {
 		return
 	}
 
-	c.SetCookie("access_token", accessToken, int((15 * time.Minute).Seconds()), "/", "localhost", true, true)
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:     "access_token",
+		Value:    accessToken,
+		Path:     "/",
+		MaxAge:   int((15 * time.Minute).Seconds()),
+		Secure:   true,
+		HttpOnly: true,
+		SameSite: http.SameSiteNoneMode,
+	})
 
 	// set refresh token cookie (long expiry)
-	c.SetCookie("refresh_token", refreshToken, int((7 * 24 * time.Hour).Seconds()), "/", "localhost", true, true)
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:     "refresh_token",
+		Value:    refreshToken,
+		Path:     "/",
+		Domain:   "",
+		MaxAge:   int((7 * 24 * time.Hour).Seconds()),
+		Secure:   true,
+		HttpOnly: true,
+		SameSite: http.SameSiteNoneMode,
+	})
 
 	// respond with success message only
 	c.JSON(http.StatusOK, gin.H{

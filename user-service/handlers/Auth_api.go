@@ -25,7 +25,15 @@ func (h *AuthHandler) GetRefreshToken(c *gin.Context) {
 		return
 	}
 
-	c.SetCookie("access_token", accessToken, int((15 * time.Minute).Seconds()), "/", "localhost", true, true)
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:     "access_token",
+		Value:    accessToken,
+		Path:     "/",
+		MaxAge:   int((15 * time.Minute).Seconds()),
+		Secure:   true,
+		HttpOnly: true,
+		SameSite: http.SameSiteNoneMode,
+	})
 
 	// respond with success message only
 	c.JSON(http.StatusOK, gin.H{
