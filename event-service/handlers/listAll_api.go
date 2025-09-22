@@ -1,0 +1,48 @@
+package handlers
+
+import (
+	"event-service/models"
+	"event-service/services"
+
+	// "net/http"
+	"strconv"
+	// "time"
+
+	"github.com/gin-gonic/gin"
+	// "go.mongodb.org/mongo-driver/bson"
+	// "go.mongodb.org/mongo-driver/mongo/options"
+)
+
+type ListAllEventHandler struct {
+	service services.GetAllEventService
+}
+
+func NewListAllEventHandler(service services.GetAllEventService) *ListAllEventHandler {
+	return &ListAllEventHandler{service: service}
+}
+func (h *ListAllEventHandler) ListEventsHandler(c *gin.Context) {
+
+	pageStr := c.DefaultQuery("page", "1")
+	limitStr := c.DefaultQuery("limit", "10")
+
+	page, _ := strconv.Atoi(pageStr)
+	limit, _ := strconv.Atoi(limitStr)
+
+	// Wrap into a struct
+	filterReq := models.EventFilterRequest{
+		Category: c.Query("category"),
+		Date:     c.Query("date"),
+		SortBy:   c.DefaultQuery("sortBy", "startDateTime"),
+		Order:    c.DefaultQuery("order", "asc"),
+		Page:     page,
+		Limit:    limit,
+	}
+
+	events, err := h.service.GetAllEvent(c.Request.Context(), filterReq)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(200, events)
+}
