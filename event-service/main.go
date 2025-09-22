@@ -17,15 +17,22 @@ func main() {
 	_ = godotenv.Load()
 	mongoCfg := config.InitMongo()
 	// 2) Wire layers
-	eventService := services.NewEventService(mongoCfg)     // signup service
-	eventHandler := handlers.NewEventHandler(eventService) // signup handler
+	eventService := services.NewEventService(mongoCfg)
+	eventHandler := handlers.NewEventHandler(eventService)
 
+	listAllEventService := services.NewGetAllEventService(mongoCfg)
+	listAllEventHandler := handlers.NewListAllEventHandler(listAllEventService)
+
+	listOneEventService := services.NewGetOneEventService(mongoCfg)
+	listOneEventHandler := handlers.NewListOneEventHandler(listOneEventService)
 	// 3) Routes
 	r := gin.Default()
 
 	events := r.Group("/events")
 	{
 		events.POST("/create", eventHandler.CreateEvent)
+		events.GET("/getall", listAllEventHandler.ListEvents)
+		events.GET("/get", listOneEventHandler.ListOneEvent)
 	}
 
 	//r.POST("/auth/refresh", authMiddleware.RequireAuth(), authHandler.GetRefreshToken)

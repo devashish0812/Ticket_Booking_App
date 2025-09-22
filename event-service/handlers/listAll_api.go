@@ -20,7 +20,7 @@ type ListAllEventHandler struct {
 func NewListAllEventHandler(service services.GetAllEventService) *ListAllEventHandler {
 	return &ListAllEventHandler{service: service}
 }
-func (h *ListAllEventHandler) ListEventsHandler(c *gin.Context) {
+func (h *ListAllEventHandler) ListEvents(c *gin.Context) {
 
 	pageStr := c.DefaultQuery("page", "1")
 	limitStr := c.DefaultQuery("limit", "10")
