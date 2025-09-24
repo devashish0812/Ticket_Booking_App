@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -23,9 +22,6 @@ func main() {
 	authService := services.NewAuthService(mongoCfg.JWTSecret, mongoCfg)
 	loginService := services.NewLoginService(mongoCfg)
 	loginHandler := handlers.NewLoginHandler(loginService, *authService)
-
-	fmt.Println("After NewAuthService")
-	println("After NewAuthService1")
 
 	authMiddleware := handlers.NewAuthMiddleware(mongoCfg.JWTSecret, *authService)
 	authHandler := handlers.NewAuthHandler(*authService)

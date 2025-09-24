@@ -25,14 +25,20 @@ func main() {
 
 	listOneEventService := services.NewGetOneEventService(mongoCfg)
 	listOneEventHandler := handlers.NewListOneEventHandler(listOneEventService)
+
+	listAllEventForOrgService := services.NewGetAllEventForOrgService(mongoCfg)
+	listAllEventForOrgHandler := handlers.NewListAllEventForOrgHandler(listAllEventForOrgService)
+
+	authMiddleware := handlers.NewAuthMiddleware(mongoCfg.JWTSecret)
 	// 3) Routes
 	r := gin.Default()
 
-	events := r.Group("/events")
+	events := r.Group("/events", authMiddleware.RequireAuth())
 	{
 		events.POST("/create", eventHandler.CreateEvent)
 		events.GET("/getall", listAllEventHandler.ListEvents)
 		events.GET("/get", listOneEventHandler.ListOneEvent)
+		events.GET("/getallForOrg", listAllEventForOrgHandler.ListEventsForOrg)
 	}
 
 	//r.POST("/auth/refresh", authMiddleware.RequireAuth(), authHandler.GetRefreshToken)

@@ -3,14 +3,9 @@ package handlers
 import (
 	"event-service/models"
 	"event-service/services"
-
-	// "net/http"
 	"strconv"
-	// "time"
 
 	"github.com/gin-gonic/gin"
-	// "go.mongodb.org/mongo-driver/bson"
-	// "go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type ListAllEventHandler struct {

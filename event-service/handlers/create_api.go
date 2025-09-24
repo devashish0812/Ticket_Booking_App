@@ -5,12 +5,7 @@ import (
 	"event-service/services"
 	"net/http"
 
-	// "strconv"
-	// "time"
-
 	"github.com/gin-gonic/gin"
-	// "go.mongodb.org/mongo-driver/bson"
-	// "go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type EventHandler struct {
@@ -23,6 +18,12 @@ func NewEventHandler(service services.EventService) *EventHandler {
 
 func (h *EventHandler) CreateEvent(c *gin.Context) {
 	var user models.Event
+
+	role, exists := c.Get("role")
+	if !exists || role != "organizer" {
+		c.JSON(403, gin.H{"error": "forbidden"})
+		return
+	}
 	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

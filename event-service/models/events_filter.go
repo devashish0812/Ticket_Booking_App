@@ -9,4 +9,5 @@ type EventFilterRequest struct {
 	Order    string   `form:"order"`    // ?order=asc | desc
 	Page     int      `form:"page,default=1"`
 	Limit    int      `form:"limit,default=10"`
+	Type     string   `form:"type"` // ?type=Upcoming | Ongoing | Past
 }

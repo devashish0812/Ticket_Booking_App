@@ -1,0 +1,16 @@
+# Ignore local environment files
+.env
+
+# Ignore build outputs
+api-gateway
+*.exe
+*.out
+*.log
+
+# Ignore VCS files
+.git
+.gitignore
+
+# Ignore IDE/editor configs
+.vscode
+.idea
