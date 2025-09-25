@@ -20,7 +20,3 @@ func RegisterAuthRoutes(r *gin.Engine, cfg config.ServiceConfig) {
 		auth.POST("/refresh", proxy.Forward(cfg.AuthService, "/auth/refresh"))
 	}
 }
-
-func RegisterEventsRoutes(r *gin.Engine, cfg config.ServiceConfig) {
-
-}

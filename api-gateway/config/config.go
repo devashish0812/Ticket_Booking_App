@@ -8,7 +8,8 @@ import (
 )
 
 type ServiceConfig struct {
-	AuthService string
+	AuthService  string
+	EventService string
 }
 
 func LoadConfig() ServiceConfig {
@@ -19,7 +20,13 @@ func LoadConfig() ServiceConfig {
 		log.Fatal("AUTH_SERVICE_URL not set")
 	}
 
+	eventURL := os.Getenv("EVENT_SERVICE_URL")
+	if eventURL == "" {
+		log.Fatal("EVENT_SERVICE_URL not set")
+	}
+
 	return ServiceConfig{
-		AuthService: authURL,
+		AuthService:  authURL,
+		EventService: eventURL,
 	}
 }
