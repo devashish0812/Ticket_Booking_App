@@ -11,7 +11,7 @@ import (
 )
 
 func RegisterDashboardRoutes(r *gin.Engine, cfg config.ServiceConfig) {
-	r.GET("/events", func(c *gin.Context) {
+	r.GET("/dashboard", func(c *gin.Context) {
 		token, err := c.Cookie("access_token")
 		if err != nil {
 			c.JSON(401, gin.H{"error": "no token found"})
