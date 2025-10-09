@@ -14,7 +14,7 @@ import (
 )
 
 type LoginService interface {
-	LoginUser(ctx context.Context, user models.User, authService AuthService) (string, string, error)
+	LoginUser(ctx context.Context, user models.User, authService AuthService) (string, string, models.User, error)
 }
 
 type loginService struct {
@@ -25,22 +25,24 @@ func NewLoginService(con *config.MongoConfig) LoginService {
 	return &loginService{con: con}
 }
 
-func (s *loginService) LoginUser(ctx context.Context, user models.User, authService AuthService) (string, string, error) {
+func (s *loginService) LoginUser(ctx context.Context, user models.User, authService AuthService) (string, string, models.User, error) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 	filter := bson.M{"name": user.Name, "password": user.Password}
 	err := s.con.UserCol.FindOne(ctx, filter).Decode(&user)
+	payload := models.User{}
+
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			println("No document found matching the filter.")
 		} else {
 			println("Error finding document:", err)
 		}
-		return "", "", err
+		return "", "", payload, err
 	}
 	accessToken, refreshToken, errToken := authService.GenerateToken(user)
 	if errToken != nil {
-		return "", "", errToken
+		return "", "", payload, errToken
 	}
 
 	// Prepare the update document
@@ -58,8 +60,10 @@ func (s *loginService) LoginUser(ctx context.Context, user models.User, authServ
 	opts := options.Update().SetUpsert(true)
 	_, errUpsert := s.con.TokenCol.UpdateOne(ctx, filterToken, update, opts)
 	if errUpsert != nil {
-		return "", "", errUpsert
+		return "", "", payload, errUpsert
 	}
 
-	return accessToken, refreshToken, nil
+	payload.Role = user.Role
+	payload.Name = user.Name
+	return accessToken, refreshToken, payload, nil
 }

@@ -1,6 +1,9 @@
 import logo from "../assets/eventflow-logo-removebg.png";
+import axios from "axios";
 function Dashboard() {
-  
+axios.get("http://localhost:8081/").then((res)=>{
+  console.log(res.data);
+})  
 
   return (
     <>
