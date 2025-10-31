@@ -1,0 +1,24 @@
+
+
+export const EVENT_CATEGORIES = [
+  "Music",
+  "Comedy", 
+  "Sports",
+  "Workshop",
+  "Magic",    
+  "Circus",   
+  "Poetry",   
+  "Storytelling", 
+
+];
+
+
+{/* <select className="w-full p-2 border rounded">
+
+        {EVENT_CATEGORIES.map((category) => (
+            <option key={category} value={category}>
+              {category}
+            </option>
+        ))}
+    
+      </select> */}

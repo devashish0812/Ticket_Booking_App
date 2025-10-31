@@ -2,6 +2,11 @@ package models
 
 import "time"
 
+type Master struct {
+	Event   Event    `json:"event" binding:"required"`
+	Tickets []Ticket `json:"tickets" binding:"required"`
+}
+
 type Event struct {
 	ID          string   `bson:"_id,omitempty" json:"id,omitempty"`
 	Title       string   `bson:"title" json:"title"`
@@ -33,8 +38,10 @@ type Event struct {
 	UpdatedAt time.Time `bson:"updatedAt" json:"updatedAt"`
 }
 
-type TicketSummary struct {
-	Type     string  `bson:"type" json:"type"`
-	Price    float64 `bson:"price" json:"price"`
-	Currency string  `bson:"currency" json:"currency"`
+type Ticket struct {
+	EventId   string    `json:"eventId,omitempty"`
+	Type      string    `json:"type" binding:"required"`
+	Price     float64   `json:"price" binding:"required"`
+	Quantity  int       `json:"quantity" binding:"required"`
+	CreatedAt time.Time `json:"createdAt,omitempty"`
 }

@@ -5,8 +5,8 @@ import (
 	"strings"
 	"time"
 
-	"event-service/config"
-	"event-service/models"
+	"github.com/devashish0812/event-service/config"
+	"github.com/devashish0812/event-service/models"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"

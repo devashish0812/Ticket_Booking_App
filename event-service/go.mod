@@ -1,18 +1,27 @@
-module event-service
+module github.com/devashish0812/event-service
 
 go 1.24.6
+
+require github.com/devashish0812/ticketingtool/common v0.0.0
+
+replace github.com/devashish0812/ticketingtool/common => ../common
 
 require github.com/gin-gonic/gin v1.10.1
 
 require (
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/klauspost/compress v1.16.7 // indirect
+	github.com/kr/pretty v0.3.0 // indirect
 	github.com/montanaflynn/stats v0.7.1 // indirect
+	github.com/pierrec/lz4/v4 v4.1.15 // indirect
+	github.com/rogpeppe/go-internal v1.8.0 // indirect
+	github.com/segmentio/kafka-go v0.4.49 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.1.2 // indirect
 	github.com/xdg-go/stringprep v1.0.4 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78 // indirect
 	golang.org/x/sync v0.17.0 // indirect
+	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 )
 
 require (

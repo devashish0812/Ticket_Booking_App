@@ -5,8 +5,8 @@ import (
 	"strings"
 	"time"
 
-	"event-service/config"
-	"event-service/models"
+	"github.com/devashish0812/event-service/config"
+	"github.com/devashish0812/event-service/models"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -16,7 +16,7 @@ import (
 )
 
 type GetAllEventService interface {
-	GetAllEvent(ctx context.Context, filterReq models.EventFilterRequest) ([]models.Event, error)
+	GetAllEvent(ctx context.Context, filterReq models.EventFilterRequest) ([]models.Event, int, error)
 }
 
 type getalleventService struct {
@@ -27,7 +27,7 @@ func NewGetAllEventService(con *config.MongoConfig) GetAllEventService {
 	return &getalleventService{con: con}
 }
 
-func (s *getalleventService) GetAllEvent(ctx context.Context, filterReq models.EventFilterRequest) ([]models.Event, error) {
+func (s *getalleventService) GetAllEvent(ctx context.Context, filterReq models.EventFilterRequest) ([]models.Event, int, error) {
 	timeoutCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
@@ -86,15 +86,19 @@ func (s *getalleventService) GetAllEvent(ctx context.Context, filterReq models.E
 	collection := s.con.EventCol
 	cursor, err := collection.Find(timeoutCtx, filters, findOptions)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	defer cursor.Close(timeoutCtx)
 
-	// Decode into slice
 	var events []models.Event
 	if err := cursor.All(timeoutCtx, &events); err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
-	return events, nil
+	totalCount, err := collection.CountDocuments(ctx, filters)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return events, int(totalCount), nil
 }

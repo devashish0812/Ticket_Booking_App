@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"event-service/models"
-	"event-service/services"
+	"github.com/devashish0812/event-service/models"
+	"github.com/devashish0812/event-service/services"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -33,11 +33,14 @@ func (h *ListAllEventHandler) ListEvents(c *gin.Context) {
 		Limit:    limit,
 	}
 
-	events, err := h.service.GetAllEvent(c.Request.Context(), filterReq)
+	events, totalCount, err := h.service.GetAllEvent(c.Request.Context(), filterReq)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(200, events)
+	c.JSON(200, gin.H{
+		"events":     events,
+		"totalCount": totalCount,
+	})
 }

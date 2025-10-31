@@ -16,17 +16,21 @@ export default function Login() {
     try {
   // 1) Login -> backend will SET cookies (access_token, refresh_token)
     const API_GATEWAY_URL = process.env.REACT_APP_API_GATEWAY_URL;
-  await axios.post(`${API_GATEWAY_URL}/auth/login`, form, {
-    withCredentials: true, // <-- send/receive cookies across origins
-  });
+    const User_Dashboard_URL = process.env.REACT_APP_User_Dashboard_URL;
+    const res= await axios.post(`${API_GATEWAY_URL}/auth/login`, form, {
+      withCredentials: true, // <-- send/receive cookies across origins
+    });
 
-  // 2) Ask API Gateway where to go; cookies will be sent automatically
-  const routeRes = await axios.get(`${API_GATEWAY_URL}/gateway/dashboard`, {
-    withCredentials: true, // <-- include cookies on this request too
-  });
-
-  const { dashboardUrl } = routeRes.data;
-  window.location.href = dashboardUrl;
+  // 2) Redirect based on role  
+  const user = res.data.user;
+     
+  if(user.role === "user"){
+    window.location.href = `${User_Dashboard_URL}`;
+  }
+  else{
+    window.location.href = `${User_Dashboard_URL}/admin`; // admin dashboard
+  }
+  
 } catch (err) {
       console.error(err.response?.data || err.message);
     }

@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"event-service/services"
+	"github.com/devashish0812/event-service/services"
 
 	// "net/http"
 	// "time"

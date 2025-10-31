@@ -4,9 +4,9 @@ import (
 	"log"
 	"os"
 
-	"event-service/config"
-	"event-service/handlers"
-	"event-service/services"
+	"github.com/devashish0812/event-service/config"
+	"github.com/devashish0812/event-service/handlers"
+	"github.com/devashish0812/event-service/services"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"

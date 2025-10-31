@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"event-service/models"
-	"event-service/services"
+	"github.com/devashish0812/event-service/models"
+	"github.com/devashish0812/event-service/services"
 	"strconv"
 
 	"github.com/gin-gonic/gin"

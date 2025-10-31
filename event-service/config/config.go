@@ -13,6 +13,7 @@ import (
 type MongoConfig struct {
 	Client    *mongo.Client
 	EventCol  *mongo.Collection
+	OutboxCol *mongo.Collection
 	JWTSecret string
 }
 
@@ -39,10 +40,12 @@ func InitMongo() *MongoConfig {
 	// Pick DB and Collection
 	db := client.Database("ticketingtool")
 	col := db.Collection("Events")
+	outboxCol := db.Collection("Outbox")
 	JWTSecret := os.Getenv("JWT_SECRET")
 	return &MongoConfig{
 		Client:    client,
 		EventCol:  col,
+		OutboxCol: outboxCol,
 		JWTSecret: JWTSecret,
 	}
 }

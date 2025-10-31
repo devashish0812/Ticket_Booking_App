@@ -38,7 +38,7 @@ func main() {
 	// 4) Start
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8080" // fallback for local
+		port = "8082" // fallback for local
 	}
 	if err := r.Run(":" + port); err != nil {
 		log.Fatal(err)
