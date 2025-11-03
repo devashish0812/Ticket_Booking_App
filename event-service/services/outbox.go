@@ -27,9 +27,11 @@ func NewOutboxService(con *config.MongoConfig) OutboxService {
 
 func (s *outboxService) StartWorker(ctx context.Context, id string) {
 	go func() {
-		ticker := time.NewTicker(5 * time.Minute)
-		defer ticker.Stop()
+		// ticker := time.NewTicker(5 * time.Minute)
 
+		ticker := time.NewTicker(30 * time.Second)
+		defer ticker.Stop()
+		log.Printf("Outbox worker %s started", id)
 		for {
 			select {
 			case <-ctx.Done():
@@ -88,14 +90,16 @@ func (s *outboxService) findPendingEvents(ctx context.Context) ([]models.OutboxE
 
 func (s *outboxService) markAsPublished(ctx context.Context, id string) error {
 	// Mongo update: set status = "published"
-	timeoutCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	timeoutCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 	collection := s.con.OutboxCol
 
-	_, err := collection.UpdateOne(timeoutCtx, bson.M{"_id": id}, bson.M{"$set": bson.M{"processed": true}})
+	_, err := collection.UpdateOne(timeoutCtx, bson.M{"eventId": id}, bson.M{"$set": bson.M{"processed": true}})
 	if err != nil {
+		log.Println("Error while Updating Status in the DB", err)
 		return err
 	}
+	log.Println("Event Status Updated in the DB", id)
 	return nil
 }
 func (s *outboxService) publishWithRetry(event models.OutboxEvent) error {
@@ -116,5 +120,6 @@ func (s *outboxService) publishWithRetry(event models.OutboxEvent) error {
 		log.Println("Outbox publish failed, will retry later:", err)
 		return err
 	}
+
 	return nil
 }

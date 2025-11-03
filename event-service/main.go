@@ -1,8 +1,12 @@
 package main
 
 import (
+	"context"
 	"log"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/devashish0812/event-service/config"
 	"github.com/devashish0812/event-service/handlers"
@@ -13,10 +17,9 @@ import (
 )
 
 func main() {
-	// 1) Initialize Mongo via config (reads MONGO_URI from env)
 	_ = godotenv.Load()
 	mongoCfg := config.InitMongo()
-	// 2) Wire layers
+
 	eventService := services.NewEventService(mongoCfg)
 	eventHandler := handlers.NewEventHandler(eventService)
 
@@ -30,9 +33,8 @@ func main() {
 	listAllEventForOrgHandler := handlers.NewListAllEventForOrgHandler(listAllEventForOrgService)
 
 	authMiddleware := handlers.NewAuthMiddleware(mongoCfg.JWTSecret)
-	// 3) Routes
-	r := gin.Default()
 
+	r := gin.Default()
 	events := r.Group("/events", authMiddleware.RequireAuth())
 	{
 		events.POST("/create", eventHandler.CreateEvent)
@@ -41,13 +43,29 @@ func main() {
 		events.GET("/getallForOrg", listAllEventForOrgHandler.ListEventsForOrg)
 	}
 
-	//r.POST("/auth/refresh", authMiddleware.RequireAuth(), authHandler.GetRefreshToken)
+	outboxService := services.NewOutboxService(mongoCfg)
+	ctx, cancel := context.WithCancel(context.Background())
+	go func() {
+		log.Println("Outbox worker started...")
+		outboxService.StartWorker(ctx, "worker-1")
+	}()
 
-	// 4) Start
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
+
+	go func() {
+		<-sigChan
+		log.Println("Shutdown signal received, stopping outbox worker...")
+		cancel()
+		time.Sleep(2 * time.Second)
+		os.Exit(0)
+	}()
+
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8080" // fallback for local
+		port = "8080"
 	}
+	log.Printf("Event Service running on port %s\n", port)
 	if err := r.Run(":" + port); err != nil {
 		log.Fatal(err)
 	}
