@@ -2,7 +2,7 @@ module github.com/devashish0812/event-service
 
 go 1.24.6
 
-require github.com/devashish0812/Ticket_Booking_App/common v0.0.1
+require github.com/devashish0812/Ticket_Booking_App/common v0.0.2
 
 require github.com/gin-gonic/gin v1.10.1
 
