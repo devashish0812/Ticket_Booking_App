@@ -2,9 +2,7 @@ module github.com/devashish0812/event-service
 
 go 1.24.6
 
-require github.com/devashish0812/ticketingtool/common v0.0.0
-
-replace github.com/devashish0812/ticketingtool/common => ../common
+require github.com/devashish0812/ticketingtool/common v0.0.1
 
 require github.com/gin-gonic/gin v1.10.1
 
