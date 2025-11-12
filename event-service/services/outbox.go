@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/devashish0812/ticketingtool/common/kafka"
+	"github.com/devashish0812/Ticket_Booking_App/common/kafka"
 
 	"github.com/devashish0812/event-service/config"
 	"github.com/devashish0812/event-service/models"

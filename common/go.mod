@@ -1,4 +1,4 @@
-module github.com/devashish0812/ticketingtool/common
+module github.com/devashish0812/Ticket_Booking_App/common
 
 go 1.23
 
