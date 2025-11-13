@@ -103,9 +103,8 @@ func (s *outboxService) markAsPublished(ctx context.Context, id string) error {
 	return nil
 }
 func (s *outboxService) publishWithRetry(event models.OutboxEvent) error {
-	producer := kafka.NewProducer(&kafka.Config{
-		Brokers: []string{"localhost:9092"},
-	})
+	cfg := kafka.LoadConfig()
+	producer := kafka.NewProducer(cfg)
 	defer producer.Close()
 	message := struct {
 		EventID string      `json:"eventId"`
