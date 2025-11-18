@@ -52,7 +52,6 @@ func (s *loginService) LoginUser(ctx context.Context, user models.User, authServ
 			"name":         user.Name,
 			"role":         user.Role,
 			"refreshToken": refreshToken,
-			"createdAt":    time.Now(),
 		},
 	}
 
