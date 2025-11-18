@@ -13,7 +13,7 @@ axiosInstance.interceptors.response.use(
   async (error) => {
     if (error.response && error.response.status === 401) {
       try {
-        await axiosInstance.get("/auth/refresh");
+        await axiosInstance.post("/auth/refresh");
 
         return axiosInstance(error.config);
         // same request retried after refreshing token
