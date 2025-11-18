@@ -13,7 +13,7 @@ function App() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        await axios.get(`${API_GATEWAY_URL}/auth/refresh`, {
+        await axios.post(`${API_GATEWAY_URL}/auth/refresh`, {
           withCredentials: true,
         });
         setIsAuthenticated(true);
