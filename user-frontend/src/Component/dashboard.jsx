@@ -3,7 +3,7 @@ import { EVENT_CATEGORIES } from "../constants/eventCategories";
 import { useEffect } from "react";
 import { useState } from "react";
 import { useRef } from "react";
-import api from "Component/axiosInstance.js";
+import axiosInstance from "./interceptor.jsx";
 function Dashboard() {
   const dateInputRef = useRef(null);
   const [events, setEvents] = useState([]);
@@ -19,7 +19,7 @@ function Dashboard() {
     const fetchEvents = async (filters) => {
       try {
         const API_GATEWAY_URL = import.meta.env.VITE_API_GATEWAY_URL;
-        const res = await api.get(
+        const res = await axiosInstance.get(
           `${API_GATEWAY_URL}/dashboard?category=${filters.category}&date=${filters.date}&page=${filters.page}&order=${filters.order}`,
           {
             withCredentials: true,

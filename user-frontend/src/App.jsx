@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import axios from "axios";
-import ProtectedRoute from "./Component/ProtectedRoute";
+import ProtectedRoute from "./Component/protected";
 import Dashboard from "./Component/dashboard";
 
 function App() {
