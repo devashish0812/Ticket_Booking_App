@@ -15,8 +15,20 @@ func main() {
 
 	// Init Gin
 	r := gin.Default()
+	// Define your list of allowed origins once
+	allowedOrigins := map[string]bool{
+		"https://ticket-booking-app-xi.vercel.app": true,
+		"http://localhost:5173":                    true,
+		"http://localhost:3000":                    true,
+		"https://user-frontend-kappa.vercel.app":   true,
+	}
+
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"https://ticket-booking-app-xi.vercel.app", "http://localhost:5173", "http://localhost:3000", "https://user-frontend-kappa.vercel.app"}, // React dev server
+		AllowOriginFunc: func(origin string) bool {
+			_, ok := allowedOrigins[origin]
+			return ok
+		},
+
 		AllowMethods:     []string{"POST", "GET", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
