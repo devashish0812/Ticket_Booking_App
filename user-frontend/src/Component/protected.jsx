@@ -1,4 +1,5 @@
 import React from "react";
+import { Outlet } from "react-router-dom";
 
 const LOGIN_APP_URL = import.meta.env.VITE_LOGIN_APP_URL;
 
