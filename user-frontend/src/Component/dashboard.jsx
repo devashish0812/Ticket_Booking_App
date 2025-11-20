@@ -15,6 +15,11 @@ function Dashboard() {
     order: "asc",
   });
 
+  const [pagination, setPagination] = useState({
+    totalCount: 0,
+    itemsPerPage: 10,
+    currentPage: 1,
+  });
   useEffect(() => {
     const fetchEvents = async (filters) => {
       try {
@@ -32,6 +37,10 @@ function Dashboard() {
         }
         setEvents(res.data.events);
         console.log(res.data.totalCount);
+        setPagination((prev) => ({
+          ...prev,
+          totalCount: res.data.totalCount,
+        }));
       } catch (error) {
         console.error("Error fetching events:", error);
         alert("Failed to fetch events for the selected category.");
@@ -59,8 +68,28 @@ function Dashboard() {
     handleFilterChange("date", committedDate);
   };
 
+  const makePaginationArray = () => {
+    const totalPages = Math.ceil(
+      pagination.totalCount / pagination.itemsPerPage
+    );
+
+    const pages = [];
+    pages.push(1);
+    if (totalPages <= 1) return pages;
+    const minStart = Math.max(2, pagination.currentPage - 2);
+    const maxEnd = Math.min(totalPages - 1, pagination.currentPage + 2);
+    if (minStart > 2) {
+      pages.push("...");
+    }
+    for (let i = minStart; i <= maxEnd; i++) {
+      pages.push(i);
+    }
+    pages.push(totalPages);
+    return pages;
+  };
+
   return (
-    <>
+    <div>
       <div className="flex justify-center py-6">
         <img src={logo} className="w-40 h-auto" alt="Logo" />
       </div>
@@ -75,11 +104,11 @@ function Dashboard() {
               <button
                 key={category}
                 className={`px-3 py-1 text-sm font-semibold rounded-full border transition-all duration-150
-                ${
-                  filters.category === category
-                    ? "bg-blue-600 text-white border-blue-600 shadow"
-                    : "bg-white text-gray-700 border-gray-300 hover:bg-gray-200"
-                }`}
+              ${
+                filters.category === category
+                  ? "bg-blue-600 text-white border-blue-600 shadow"
+                  : "bg-white text-gray-700 border-gray-300 hover:bg-gray-200"
+              }`}
                 onClick={
                   filters.category === category
                     ? () => handleCategoryClick("")
@@ -120,11 +149,11 @@ function Dashboard() {
               }}
               value={`${filters.sortBy}-${filters.order}`}
             >
-              <option value="date-asc">Date (Ascending) 📅</option>
-              <option value="date-desc">Date (Descending) ⬇️</option>
-              <option value="category-asc">Category Name (A-Z) 🅰️</option>
-              <option value="category-desc">Category Name (Z-A) 🇿</option>
-              <option value="price-asc">Price (Low to High) 💰</option>
+              <option value="date-asc">Date (Ascending)</option>
+              <option value="date-desc">Date (Descending)</option>
+              <option value="category-asc">Category Name (A-Z) </option>
+              <option value="category-desc">Category Name (Z-A) </option>
+              <option value="price-asc">Price (Low to High)</option>
             </select>
           </div>
         </div>
@@ -154,9 +183,36 @@ function Dashboard() {
           </div>
         </div>
 
-        <div className="w-1/6"></div>
+        <div className="w-1/6">
+          <h2 className="font-bold mb-4 text-lg">Pages</h2>
+          <div className="flex flex-col gap-2">
+            {makePaginationArray().map((page, index) => (
+              <button
+                key={index}
+                disabled={page === "..."}
+                className={`px-3 py-1 text-sm font-semibold rounded-full border transition-all duration-150
+              ${
+                page === pagination.currentPage
+                  ? "bg-blue-600 text-white border-blue-600 shadow"
+                  : "bg-white text-gray-700 border-gray-300 hover:bg-gray-200"
+              }`}
+                onClick={() => {
+                  if (page !== "...") {
+                    setPagination((prev) => ({
+                      ...prev,
+                      currentPage: page,
+                    }));
+                    handleFilterChange("page", page.toString());
+                  }
+                }}
+              >
+                {page}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
-    </>
+    </div>
   );
 }
 export default Dashboard;
