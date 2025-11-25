@@ -26,45 +26,44 @@ func NewOutboxService(con *config.MongoConfig) OutboxService {
 }
 
 func (s *outboxService) StartWorker(ctx context.Context, id string) {
-	go func() {
-		// ticker := time.NewTicker(5 * time.Minute)
+	// ticker := time.NewTicker(5 * time.Minute)
 
-		ticker := time.NewTicker(30 * time.Second)
-		defer ticker.Stop()
-		log.Printf("Outbox worker %s started", id)
-		for {
-			select {
-			case <-ctx.Done():
-				log.Printf("Outbox worker %s stopped: %v", id, ctx.Err())
-				return
-			case <-ticker.C:
-				events, err := s.findPendingEvents(ctx)
-				// event here means outbox events
-				if err != nil {
-					log.Println("Error reading outbox:", err)
+	ticker := time.NewTicker(30 * time.Second)
+	defer ticker.Stop()
+	log.Printf("Outbox worker %s started", id)
+	for {
+		select {
+		case <-ctx.Done():
+			log.Printf("Outbox worker %s stopped: %v", id, ctx.Err())
+			return
+		case <-ticker.C:
+			events, err := s.findPendingEvents(ctx)
+			// event here means outbox events
+			if err != nil {
+				log.Println("Error reading outbox:", err)
+				continue
+			}
+
+			for _, evt := range events {
+				select {
+				case <-ctx.Done():
+					log.Println("Context cancelled while processing event batch, stopping.")
+					return
+				default:
+				}
+
+				if err := s.publishWithRetry(evt); err != nil {
+					log.Println("Publish failed:", err)
 					continue
 				}
-
-				for _, evt := range events {
-					select {
-					case <-ctx.Done():
-						log.Println("Context cancelled while processing event batch, stopping.")
-						return
-					default:
-					}
-
-					if err := s.publishWithRetry(evt); err != nil {
-						log.Println("Publish failed:", err)
-						continue
-					}
-					if err := s.markAsPublished(ctx, evt.EventID); err != nil {
-						log.Printf("Failed to mark event %s as published: %v", evt.ID, err)
-					}
-
+				if err := s.markAsPublished(ctx, evt.EventID); err != nil {
+					log.Printf("Failed to mark event %s as published: %v", evt.ID, err)
 				}
+
 			}
 		}
-	}()
+	}
+
 }
 
 func (s *outboxService) findPendingEvents(ctx context.Context) ([]models.OutboxEvent, error) {
