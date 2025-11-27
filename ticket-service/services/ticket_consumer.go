@@ -2,30 +2,34 @@ package services
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
+	"ticket-service/models"
+	"time"
 
-	customkafka "github.com/devashish0812/Ticketing_App/common/kafka"
-	kafka "github.com/segmentio/kafka-go"
+	customkafka "github.com/devashish0812/Ticket_Booking_App/common/kafka"
+	"github.com/segmentio/kafka-go"
 )
 
 type Worker struct {
-	topic   string
-	groupID string
+	topic     string
+	groupID   string
+	ticketSvc *TicketService
 }
 
-func NewWorker(topic string, groupID string) *Worker {
+func NewWorker(topic string, groupID string, ticketSvc *TicketService) *Worker {
 	return &Worker{
-		topic:   topic,
-		groupID: groupID,
+		topic:     topic,
+		groupID:   groupID,
+		ticketSvc: ticketSvc,
 	}
 }
 
 func (w *Worker) Run(ctx context.Context) {
-
 	cfg := customkafka.LoadConfig()
-
 	kConsumer := customkafka.NewConsumer(cfg, w.groupID, w.topic)
+
 	defer func() {
 		if err := kConsumer.Close(); err != nil {
 			log.Printf("Error closing consumer: %v", err)
@@ -33,37 +37,39 @@ func (w *Worker) Run(ctx context.Context) {
 	}()
 
 	fmt.Printf("Worker started for Topic: %s | Group: %s\n", w.topic, w.groupID)
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		default:
+		}
 
-	msgChan := make(chan kafka.Message)
-
-	// 4. Start the Pump (Go Routine)
-	// Reads from Kafka -> Writes to Channel
-	go func() {
-		defer close(msgChan)
-		for {
+		msg, err := kConsumer.ReadMessage(ctx)
+		if err != nil {
 			if ctx.Err() != nil {
 				return
 			}
-
-			msg, err := kConsumer.ReadMessage(ctx)
-			if err != nil {
-				if ctx.Err() != nil {
-					return
-				}
-				log.Printf("Error reading message: %v\n", err)
-				continue
-			}
-
-			select {
-			case msgChan <- msg:
-			case <-ctx.Done():
-				return
-			}
+			log.Printf("Error reading message: %v\n", err)
+			time.Sleep(1 * time.Second)
+			continue
 		}
-	}()
 
-	for msg := range msgChan {
-		// Your processing logic goes here
-		fmt.Printf("Received Key: %s | Value: %s\n", string(msg.Key), string(msg.Value))
+		if err := w.processMessage(ctx, msg); err != nil {
+			log.Printf("Error processing message: %v\n", err)
+			// Handle failure (retry, DLQ, etc.)
+		}
 	}
+}
+
+func (w *Worker) processMessage(ctx context.Context, msg kafka.Message) error {
+	var payload []models.Ticket
+	if err := json.Unmarshal(msg.Value, &payload); err != nil {
+		return fmt.Errorf("unmarshal error: %w", err)
+	}
+
+	if err := w.ticketSvc.CreateTicket(ctx, payload); err != nil {
+		return fmt.Errorf("create tickets error: %w", err)
+	}
+
+	return nil
 }
