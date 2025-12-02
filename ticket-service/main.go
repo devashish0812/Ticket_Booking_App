@@ -16,12 +16,14 @@ import (
 
 func main() {
 	_ = godotenv.Load()
-	mongoCfg := config.InitMongo()
+	dependencies := config.LoadDependencies()
 
-	createTicketService := services.NewTicketService(mongoCfg.TicketCol)
+	createTicketService := services.NewTicketService(dependencies.TicketCol)
 
-	outboxService := services.NewWorker("", , createTicketService.(*services.TicketService))
+	outboxService := services.NewWorker(dependencies.Topic, dependencies.GroupID, createTicketService.(*services.TicketService))
+
 	ctx, cancel := context.WithCancel(context.Background())
+
 	go func() {
 		log.Println("Outbox worker started...")
 		outboxService.Run(ctx)
@@ -30,18 +32,15 @@ func main() {
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
 
-	go func() {
-		<-sigChan
-		log.Println("Shutdown signal received, stopping outbox worker...")
-		cancel()
-		time.Sleep(2 * time.Second)
-		os.Exit(0)
-	}()
-
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
 	}
 	log.Printf("Event Service running on port %s\n", port)
+	<-sigChan
 
+	log.Println("Shutdown signal received, stopping outbox worker...")
+	cancel()
+	time.Sleep(2 * time.Second)
+	log.Println("Exiting.")
 }

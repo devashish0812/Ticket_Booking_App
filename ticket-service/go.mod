@@ -9,6 +9,7 @@ require github.com/pierrec/lz4/v4 v4.1.15 // indirect
 require (
 	github.com/devashish0812/Ticket_Booking_App/common v0.1.5
 	github.com/golang/snappy v0.0.4 // indirect
+	github.com/joho/godotenv v1.5.1
 	github.com/klauspost/compress v1.16.7 // indirect
 	github.com/montanaflynn/stats v0.7.1 // indirect
 	github.com/segmentio/kafka-go v0.4.49

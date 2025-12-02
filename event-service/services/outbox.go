@@ -26,9 +26,9 @@ func NewOutboxService(con *config.MongoConfig) OutboxService {
 }
 
 func (s *outboxService) StartWorker(ctx context.Context, id string) {
-	ticker := time.NewTicker(5 * time.Minute)
+	//ticker := time.NewTicker(5 * time.Minute)
 
-	//ticker := time.NewTicker(30 * time.Second)
+	ticker := time.NewTicker(30 * time.Second)
 	defer ticker.Stop()
 	log.Printf("Outbox worker %s started", id)
 	for {

@@ -10,13 +10,15 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type MongoConfig struct {
+type ServiceDependencies struct {
 	Client    *mongo.Client
 	TicketCol *mongo.Collection
 	JWTSecret string
+	Topic     string
+	GroupID   string
 }
 
-func InitMongo() *MongoConfig {
+func LoadDependencies() *ServiceDependencies {
 	uri := os.Getenv("MONGO_URI") // from .env
 	if uri == "" {
 		log.Fatal("MONGO_URI not set in environment")
@@ -40,9 +42,14 @@ func InitMongo() *MongoConfig {
 	db := client.Database("ticketingtool")
 	col := db.Collection("Tickets")
 	JWTSecret := os.Getenv("JWT_SECRET")
-	return &MongoConfig{
+	Topic := os.Getenv("KAFKA_TOPIC")
+	GroupID := os.Getenv("KAFKA_GROUP_ID")
+
+	return &ServiceDependencies{
 		Client:    client,
 		TicketCol: col,
 		JWTSecret: JWTSecret,
+		Topic:     Topic,
+		GroupID:   GroupID,
 	}
 }

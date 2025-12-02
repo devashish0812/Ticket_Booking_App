@@ -62,12 +62,18 @@ func (w *Worker) Run(ctx context.Context) {
 }
 
 func (w *Worker) processMessage(ctx context.Context, msg kafka.Message) error {
-	var payload []models.Ticket
-	if err := json.Unmarshal(msg.Value, &payload); err != nil {
-		return fmt.Errorf("unmarshal error: %w", err)
+
+	type EventWrapper struct {
+		EventID string          `json:"eventId"`
+		Payload []models.Ticket `json:"payload"`
 	}
 
-	if err := w.ticketSvc.CreateTicket(ctx, payload); err != nil {
+	var wrapper EventWrapper
+
+	if err := json.Unmarshal(msg.Value, &wrapper); err != nil {
+		return fmt.Errorf("unmarshal error: %w", err)
+	}
+	if err := w.ticketSvc.CreateTicket(ctx, wrapper.Payload); err != nil {
 		return fmt.Errorf("create tickets error: %w", err)
 	}
 
