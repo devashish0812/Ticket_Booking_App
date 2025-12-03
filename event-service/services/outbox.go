@@ -106,8 +106,8 @@ func (s *outboxService) publishWithRetry(event models.OutboxEvent) error {
 	producer := kafka.NewProducer(cfg)
 	defer producer.Close()
 	message := struct {
-		EventID string      `json:"eventId"`
-		Payload interface{} `json:"payload"`
+		EventID string          `json:"eventId"`
+		Payload []models.Ticket `json:"payload"`
 	}{
 		EventID: event.EventID,
 		Payload: event.Payload,
