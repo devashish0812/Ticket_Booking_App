@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import axios from "axios";
 import ProtectedRoute from "./Component/protected";
 import Dashboard from "./Component/dashboard";
+import EventDetails from "./Component/eventDetails";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -43,6 +44,7 @@ function App() {
             }
           >
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/event/:id" element={<EventDetails />} />
           </Route>
         </Routes>
       </BrowserRouter>

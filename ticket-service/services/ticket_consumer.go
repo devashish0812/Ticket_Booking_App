@@ -56,7 +56,6 @@ func (w *Worker) Run(ctx context.Context) {
 
 		if err := w.processMessage(ctx, msg); err != nil {
 			log.Printf("Error processing message: %v\n", err)
-			// Handle failure (retry, DLQ, etc.)
 		}
 	}
 }
@@ -73,6 +72,7 @@ func (w *Worker) processMessage(ctx context.Context, msg kafka.Message) error {
 	if err := json.Unmarshal(msg.Value, &wrapper); err != nil {
 		return fmt.Errorf("unmarshal error: %w", err)
 	}
+
 	if err := w.ticketSvc.CreateTicket(ctx, wrapper.Payload); err != nil {
 		return fmt.Errorf("create tickets error: %w", err)
 	}

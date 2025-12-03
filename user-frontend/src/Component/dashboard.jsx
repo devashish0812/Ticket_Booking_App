@@ -4,7 +4,9 @@ import { useEffect } from "react";
 import { useState } from "react";
 import { useRef } from "react";
 import axiosInstance from "./interceptor.jsx";
+import { useNavigate } from "react-router-dom";
 function Dashboard() {
+  const navigate = useNavigate();
   const dateInputRef = useRef(null);
   const [events, setEvents] = useState([]);
   const [filters, setFilters] = useState({
@@ -163,6 +165,7 @@ function Dashboard() {
             {events.map((event) => (
               <div
                 key={event.id}
+                onClick={() => navigate(`/event/${event.id}`)}
                 className="bg-white shadow-md p-4 rounded-lg hover:shadow-lg transition-shadow"
               >
                 <img

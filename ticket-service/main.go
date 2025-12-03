@@ -32,15 +32,16 @@ func main() {
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
 
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-	}
-	log.Printf("Event Service running on port %s\n", port)
 	<-sigChan
 
 	log.Println("Shutdown signal received, stopping outbox worker...")
 	cancel()
 	time.Sleep(2 * time.Second)
-	log.Println("Exiting.")
+	log.Println("Service stopped gracefully")
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	log.Printf("Ticket Service running on port %s\n", port)
+
 }
