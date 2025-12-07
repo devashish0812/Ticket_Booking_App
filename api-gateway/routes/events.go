@@ -10,8 +10,11 @@ import (
 func RegisterEventsRoutes(r *gin.Engine, cfg config.ServiceConfig) {
 	auth := r.Group("/events")
 	{
-		// Gateway: GET /events/:id  →  EventService: GET /events/:id
-		auth.GET("/:id", proxy.Forward(cfg.EventService, "/events/get/:id"))
+		auth.GET("/:id", func(c *gin.Context) {
+			id := c.Param("id")
+			targetPath := "/events/get/" + id
 
+			proxy.Forward(cfg.EventService, targetPath)(c)
+		})
 	}
 }

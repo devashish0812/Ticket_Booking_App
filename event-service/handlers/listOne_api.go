@@ -20,8 +20,8 @@ func NewListOneEventHandler(service services.GetOneEventService) *ListOneEventHa
 }
 func (h *ListOneEventHandler) ListOneEvent(c *gin.Context) {
 
-	id := c.Query("id")
-
+	// id := c.Query("id")
+	id := c.Param("id")
 	event, err := h.service.GetOneEvent(c.Request.Context(), id)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axiosInstance from "./interceptor"; // Import your existing interceptor
-import logo from "../assets/eventflow-logo-removebg.png"; // Assuming logo is here
+import axiosInstance from "./interceptor";
+import logo from "../assets/eventflow-logo-removebg.png";
 
 function EventDetails() {
   const { id } = useParams(); // Get event ID from URL
@@ -37,7 +37,6 @@ function EventDetails() {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-10">
-      {/* Header / Nav */}
       <div className="flex justify-center py-6 bg-white shadow-sm mb-6">
         <img
           src={logo}
@@ -48,12 +47,11 @@ function EventDetails() {
       </div>
 
       <div className="max-w-5xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
-        {/* Banner Image */}
         {event.bannerImageUrl ? (
           <img
             src={event.bannerImageUrl}
             alt={event.title}
-            className="w-full h-64 md:h-96 object-cover"
+            className="w-full h-full object-contain md:h-96"
           />
         ) : (
           <div className="w-full h-64 bg-gray-200 flex items-center justify-center text-gray-400">
@@ -62,7 +60,6 @@ function EventDetails() {
         )}
 
         <div className="p-8">
-          {/* Header Section */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center border-b pb-6 mb-6">
             <div>
               <span className="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded uppercase tracking-wide">
@@ -77,7 +74,6 @@ function EventDetails() {
               </p>
             </div>
 
-            {/* Date Block */}
             <div className="mt-4 md:mt-0 text-right">
               <div className="text-lg font-semibold text-blue-600">
                 {new Date(event.startDateTime).toLocaleDateString(undefined, {
@@ -97,7 +93,6 @@ function EventDetails() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Left Column: Description */}
             <div className="md:col-span-2">
               <h2 className="text-xl font-bold mb-4">About Event</h2>
               <p className="text-gray-700 whitespace-pre-line leading-relaxed">
@@ -123,7 +118,6 @@ function EventDetails() {
               )}
             </div>
 
-            {/* Right Column: Info Card */}
             <div className="bg-gray-50 p-6 rounded-xl h-fit">
               <h3 className="text-lg font-bold mb-4">Event Info</h3>
 

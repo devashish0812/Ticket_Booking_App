@@ -39,7 +39,7 @@ func main() {
 	{
 		events.POST("/create", eventHandler.CreateEvent)
 		events.GET("/getall", listAllEventHandler.ListEvents)
-		events.GET("/get", listOneEventHandler.ListOneEvent)
+		events.GET("/get/:id", listOneEventHandler.ListOneEvent)
 		events.GET("/getallForOrg", listAllEventForOrgHandler.ListEventsForOrg)
 	}
 
