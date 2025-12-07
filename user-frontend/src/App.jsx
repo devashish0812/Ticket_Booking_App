@@ -43,7 +43,7 @@ function App() {
               />
             }
           >
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/" element={<Dashboard />} />
             <Route path="/event/:id" element={<EventDetails />} />
           </Route>
         </Routes>
