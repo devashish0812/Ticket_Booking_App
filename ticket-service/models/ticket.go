@@ -12,6 +12,8 @@ type Seat struct {
 	Category    string             `json:"category" bson:"category"`     // "Gold", "Silver"
 	SeatNumber  string             `json:"seatNumber" bson:"seatNumber"` // "G-1", "G-2", "S-1"
 	Row         string             `json:"row" bson:"row"`               // "A", "B", "C" (optional)
+	Column      string             `json:"column" bson:"column"`         // "A", "B", "C" (optional)
+	Section     string             `json:"section" bson:"section"`       // "A", "B", "C" (optional)
 	Price       float64            `json:"price" bson:"price"`
 	Status      string             `json:"status" bson:"status"`                               // "available", "locked", "booked"
 	LockedBy    string             `json:"lockedBy,omitempty" bson:"lockedBy,omitempty"`       // UserID

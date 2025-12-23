@@ -21,10 +21,8 @@ func Forward(target string, backendPath string) gin.HandlerFunc {
 		c.Request.Host = remote.Host
 		c.Request.URL.Scheme = remote.Scheme
 		c.Request.URL.Host = remote.Host
-		// overwrite only the path
 		c.Request.URL.Path = backendPath
 
-		// log outgoing request
 		log.Printf("Proxying → %s %s%s", c.Request.Method, target, backendPath)
 
 		proxy.ServeHTTP(c.Writer, c.Request)

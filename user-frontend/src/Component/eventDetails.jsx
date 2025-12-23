@@ -4,7 +4,7 @@ import axiosInstance from "./interceptor";
 import logo from "../assets/eventflow-logo-removebg.png";
 
 function EventDetails() {
-  const { id } = useParams(); // Get event ID from URL
+  const { id } = useParams();
   const navigate = useNavigate();
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -148,7 +148,14 @@ function EventDetails() {
 
               <button
                 className="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded transition duration-200"
-                onClick={() => alert("Booking logic here!")}
+                onClick={() =>
+                  navigate(`/categories/${id}`, {
+                    state: {
+                      eventTitle: event.title,
+                      eventDate: event.startDateTime,
+                    },
+                  })
+                }
               >
                 Book Tickets
               </button>

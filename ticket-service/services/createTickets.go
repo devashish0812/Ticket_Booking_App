@@ -29,18 +29,39 @@ func (s *TicketService) CreateTicket(ctx context.Context, Tickets []models.Ticke
 	now := time.Now()
 	var allSeats []interface{}
 
-	for _, ticket := range Tickets {
-		for i := 0; i < ticket.Quantity; i++ {
+	const (
+		SeatsPerSection = 500
+		ColumnsPerRow   = 25
+	)
+
+	for _, req := range Tickets {
+		for i := 0; i < req.Quantity; i++ {
+			sectionIndex := (i / SeatsPerSection) + 1
+			posInSection := i % SeatsPerSection
+			rowIndex := (posInSection / ColumnsPerRow) + 1
+			colIndex := (posInSection % ColumnsPerRow) + 1
+
+			sectionName := fmt.Sprintf("%s-Block-%d", req.Type, sectionIndex)
+			rowStr := fmt.Sprintf("%d", rowIndex)
+			colStr := fmt.Sprintf("%d", colIndex)
+
+			seatNum := fmt.Sprintf("%s-B%d-R%d-C%d",
+				req.Type, sectionIndex, rowIndex, colIndex)
+
 			seat := models.Seat{
 				ID:         primitive.NewObjectID(),
-				EventID:    ticket.EventId,
-				Category:   ticket.Type,
-				SeatNumber: ticket.Type + "-" + fmt.Sprintf("%04d", i+1),
-				Price:      ticket.Price,
+				EventID:    req.EventId,
+				Category:   req.Type,
+				Section:    sectionName, // "Gold-Block-1"
+				Row:        rowStr,      // "1"
+				Column:     colStr,      // "1"
+				SeatNumber: seatNum,     // "Gold-B1-R1-C1"
+				Price:      req.Price,
 				Status:     "available",
 				CreatedAt:  now,
 				UpdatedAt:  now,
 			}
+
 			allSeats = append(allSeats, seat)
 		}
 	}

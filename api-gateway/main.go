@@ -39,6 +39,7 @@ func main() {
 	routes.RegisterAuthRoutes(r, cfg)
 	routes.RegisterDashboardRoutes(r, cfg)
 	routes.RegisterEventsRoutes(r, cfg)
+	routes.RegisterTicketsRoutes(r, cfg)
 
 	// Run Gateway
 	r.Run(":8081") // Gateway will run on port 8081

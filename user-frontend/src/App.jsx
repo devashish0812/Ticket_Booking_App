@@ -4,6 +4,7 @@ import axios from "axios";
 import ProtectedRoute from "./Component/protected";
 import Dashboard from "./Component/dashboard";
 import EventDetails from "./Component/eventDetails";
+import CategorySelection from "./Component/categorySelection";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -14,7 +15,6 @@ function App() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        debugger;
         await axios.post(
           `${API_GATEWAY_URL}/auth/refresh`,
           {},
@@ -43,8 +43,12 @@ function App() {
               />
             }
           >
-            <Route path="/" element={<Dashboard />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/event/:id" element={<EventDetails />} />
+            <Route
+              path="/categories/:eventId"
+              element={<CategorySelection />}
+            />
           </Route>
         </Routes>
       </BrowserRouter>
