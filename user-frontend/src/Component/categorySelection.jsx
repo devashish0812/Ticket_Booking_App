@@ -36,18 +36,15 @@ function CategorySelection() {
   }, [eventId]);
 
   const handleCategorySelect = (category) => {
-    navigate(
-      `/events/${eventId}/categories/${category.category_name}/sections`,
-      {
-        state: {
-          eventTitle,
-          eventDate,
-          eventVenue,
-          categoryName: category.category_name,
-          categoryPrice: category.price,
-        },
-      }
-    );
+    navigate(`/events/${eventId}/categories/${category.category_name}`, {
+      state: {
+        eventTitle,
+        eventDate,
+        eventVenue,
+        categoryName: category.category_name,
+        categoryPrice: category.price,
+      },
+    });
   };
 
   if (loading)

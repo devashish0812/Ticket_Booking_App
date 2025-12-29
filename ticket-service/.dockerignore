@@ -2,8 +2,8 @@
 .env
 
 # Ignore build outputs
-event-service/build/
-event-service/bin/
+ticket-service/build/
+ticket-service/bin/
 *.exe
 *.out
 *.log

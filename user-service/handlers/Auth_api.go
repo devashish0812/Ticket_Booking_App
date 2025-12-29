@@ -35,7 +35,6 @@ func (h *AuthHandler) GetRefreshToken(c *gin.Context) {
 		SameSite: http.SameSiteNoneMode,
 	})
 
-	// respond with success message only
 	c.JSON(http.StatusOK, gin.H{
 		"message": "token refreshed successfully",
 	})

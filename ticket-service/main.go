@@ -20,11 +20,14 @@ func main() {
 	_ = godotenv.Load()
 	dependencies := config.LoadDependencies()
 
-	// 1. Setup Services
 	createTicketService := services.NewTicketService(dependencies.TicketCol)
 	outboxService := services.NewWorker(dependencies.Topic, dependencies.GroupID, createTicketService.(*services.TicketService))
+
 	categoryService := services.NewCategoryService(dependencies.TicketCol)
 	categoryHandler := handlers.NewCategoryHandler(categoryService.(*services.CategoryService))
+
+	sectionService := services.NewSectionService(dependencies.TicketCol)
+	sectionHandler := handlers.NewSectionHandler(sectionService.(*services.SectionService))
 
 	authMiddleware := handlers.NewAuthMiddleware(dependencies.JWTSecret)
 
@@ -32,6 +35,7 @@ func main() {
 	tickets := r.Group("/tickets", authMiddleware.RequireAuth())
 	{
 		tickets.GET("/categories/:id", categoryHandler.ListAllCategories)
+		tickets.GET("/events/:eventId/categories/:category", sectionHandler.ListAllSection)
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())

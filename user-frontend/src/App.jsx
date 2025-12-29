@@ -5,6 +5,7 @@ import ProtectedRoute from "./Component/protected";
 import Dashboard from "./Component/dashboard";
 import EventDetails from "./Component/eventDetails";
 import CategorySelection from "./Component/categorySelection";
+import SectionSelection from "./Component/sectionSelection";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -48,6 +49,10 @@ function App() {
             <Route
               path="/categories/:eventId"
               element={<CategorySelection />}
+            />
+            <Route
+              path="/events/:eventId/categories/:categoryName"
+              element={<SectionSelection />}
             />
           </Route>
         </Routes>

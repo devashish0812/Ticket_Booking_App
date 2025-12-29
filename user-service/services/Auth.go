@@ -36,7 +36,6 @@ func NewAuthService(jwtSecret string, con *config.MongoConfig) *AuthService {
 }
 
 func (a *AuthService) GenerateToken(user models.User) (string, string, error) {
-	fmt.Println("sign key:", a.SecretKey)
 	accessClaims := &Claims{
 		Userid: user.Userid.Hex(),
 		Name:   user.Name,
@@ -75,7 +74,6 @@ func (a *AuthService) GenerateToken(user models.User) (string, string, error) {
 func (a *AuthService) ValidateToken(ctx context.Context, userid string, refreshToken string) (string, string, error) {
 
 	filter := bson.M{"userId": userid, "refreshToken": refreshToken}
-	fmt.Println(userid, refreshToken)
 	var result bson.M
 	err := a.con.TokenCol.FindOne(ctx, filter).Decode(&result)
 	if err != nil {
