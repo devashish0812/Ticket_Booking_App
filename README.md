@@ -117,6 +117,4 @@ graph TD
 - **`ticket-service`**: Consumes Kafka events to generate tickets; manages inventory.
 - **`common-module`**: Shared library for Kafka config and generic helpers.
 
-```
 
-```
