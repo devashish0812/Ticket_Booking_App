@@ -109,12 +109,16 @@ graph TD
 
 ---
 
-## Microservices Overview
+##  Microservices Overview
 
-- **`api-gateway`**: Entry point and router.
-- **`user-service`**: User management and token generation.
-- **`event-service`**: Manages event metadata and the Outbox table.
-- **`ticket-service`**: Consumes Kafka events to generate tickets; manages inventory.
-- **`common-module`**: Shared library for Kafka config and generic helpers.
+This system relies on the following distributed services:
+
+| Service Name | Type | Key Responsibility |
+| :--- | :--- | :--- |
+| **`api-gateway`** | Entry Point | Reverse Proxy, JWT Validation, Request Routing |
+| **`auth-service`** | Core Domain | User Identity, Access/Refresh Token Management |
+| **`event-service`** | Core Domain | Event Metadata, Outbox Transaction Handling |
+| **`ticket-service`** | Consumer | Kafka Consumer, Inventory Generation, Booking Logic |
+| **`common-module`** | Library | Shared Kafka Configs, Middleware, Error Constants |
 
 
