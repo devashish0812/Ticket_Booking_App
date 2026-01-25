@@ -23,5 +23,9 @@ func RegisterTicketsRoutes(r *gin.Engine, cfg config.ServiceConfig) {
 
 			proxy.Forward(cfg.TicketService, targetPath)(c)
 		})
+		auth.POST("/seats/lock", func(c *gin.Context) {
+			targetPath := "/tickets/seats/lock"
+			proxy.Forward(cfg.TicketService, targetPath)(c)
+		})
 	}
 }
