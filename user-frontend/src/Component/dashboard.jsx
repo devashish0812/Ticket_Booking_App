@@ -25,12 +25,8 @@ function Dashboard() {
   useEffect(() => {
     const fetchEvents = async (filters) => {
       try {
-        const API_GATEWAY_URL = import.meta.env.VITE_API_GATEWAY_URL;
         const res = await axiosInstance.get(
-          `${API_GATEWAY_URL}/dashboard?category=${filters.category}&date=${filters.date}&page=${filters.page}&order=${filters.order}`,
-          {
-            withCredentials: true,
-          }
+          `/dashboard?category=${filters.category}&date=${filters.date}&page=${filters.page}&order=${filters.order}`
         );
 
         if (res.data === null || res.data.length === 0) {

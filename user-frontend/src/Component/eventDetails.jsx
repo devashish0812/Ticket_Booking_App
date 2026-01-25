@@ -13,8 +13,7 @@ function EventDetails() {
   useEffect(() => {
     const fetchEventDetails = async () => {
       try {
-        const API_GATEWAY_URL = import.meta.env.VITE_API_GATEWAY_URL;
-        const res = await axiosInstance.get(`${API_GATEWAY_URL}/events/${id}`);
+        const res = await axiosInstance.get(`/events/${id}`);
         setEvent(res.data);
       } catch (err) {
         console.error("Error fetching event details:", err);

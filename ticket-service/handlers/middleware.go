@@ -50,6 +50,6 @@ func (m *AuthMiddleware) RequireAuth() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-
+		c.Set("userID", userId)
 	}
 }

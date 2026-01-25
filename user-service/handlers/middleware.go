@@ -23,14 +23,14 @@ func NewAuthMiddleware(secretKey string, authService services.AuthService) *Auth
 
 func (m *AuthMiddleware) RequireAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// 1. Extract token from header
+
 		tokenString, err := c.Cookie("refresh_token") // for /auth/refresh
 		if err != nil || tokenString == "" {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "missing refresh token cookie"})
 			c.Abort()
 			return
 		}
-		// 2. Validate token (signature + expiry)
+		// Validate token (signature + expiry)
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])

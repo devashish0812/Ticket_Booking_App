@@ -17,11 +17,7 @@ function CategorySelection() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        debugger;
-        const API_GATEWAY_URL = import.meta.env.VITE_API_GATEWAY_URL;
-        const res = await axiosInstance.get(
-          `${API_GATEWAY_URL}/tickets/categories/${eventId}`
-        );
+        const res = await axiosInstance.get(`/tickets/categories/${eventId}`);
         console.log(res.data);
         setCategories(res.data);
       } catch (err) {

@@ -10,12 +10,9 @@ import (
 )
 
 func main() {
-	// Load service config (.env)
 	cfg := config.LoadConfig()
 
-	// Init Gin
 	r := gin.Default()
-	// Define your list of allowed origins once
 	allowedOrigins := map[string]bool{
 		"https://ticket-booking-app-xi.vercel.app": true,
 		"http://localhost:5173":                    true,

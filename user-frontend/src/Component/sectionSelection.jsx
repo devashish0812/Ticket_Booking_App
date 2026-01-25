@@ -18,10 +18,8 @@ function SectionSelection() {
   useEffect(() => {
     const fetchSections = async () => {
       try {
-        const API_GATEWAY_URL = import.meta.env.VITE_API_GATEWAY_URL;
-
         const res = await axiosInstance.get(
-          `${API_GATEWAY_URL}/tickets/events/${eventId}/categories/${categoryName}`
+          `/tickets/events/${eventId}/categories/${categoryName}`
         );
         console.log(res.data);
         setSections(res.data);

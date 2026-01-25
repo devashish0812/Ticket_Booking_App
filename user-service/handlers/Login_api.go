@@ -42,7 +42,6 @@ func (h *LoginHandler) Login(c *gin.Context) {
 		SameSite: http.SameSiteNoneMode,
 	})
 
-	// set refresh token cookie (long expiry)
 	http.SetCookie(c.Writer, &http.Cookie{
 		Name:     "refresh_token",
 		Value:    refreshToken,
@@ -54,7 +53,6 @@ func (h *LoginHandler) Login(c *gin.Context) {
 		SameSite: http.SameSiteNoneMode,
 	})
 
-	// respond with success message only
 	c.JSON(http.StatusOK, gin.H{
 		"message": "logged in successfully",
 		"user": gin.H{
