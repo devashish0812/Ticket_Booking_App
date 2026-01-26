@@ -6,7 +6,7 @@ import Dashboard from "./Component/dashboard";
 import EventDetails from "./Component/eventDetails";
 import CategorySelection from "./Component/categorySelection";
 import SectionSelection from "./Component/sectionSelection";
-
+import SeatSelection from "./Component/seatSelection";
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -53,6 +53,10 @@ function App() {
             <Route
               path="/events/:eventId/categories/:categoryName"
               element={<SectionSelection />}
+            />
+            <Route
+              path="/events/:eventId/sections/:sectionName/seats"
+              element={<SeatSelection />}
             />
           </Route>
         </Routes>

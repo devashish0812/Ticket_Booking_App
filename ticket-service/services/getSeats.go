@@ -12,17 +12,16 @@ type SeatsService struct {
 	db *mongo.Collection
 }
 type ISeatsService interface {
-	GetSeats(ctx context.Context, eventID string, categoryName string, sectionName string) ([]models.Seat, error)
+	GetSeats(ctx context.Context, eventID string, sectionName string) ([]models.Seat, error)
 }
 
 func NewSeatsService(db *mongo.Collection) ISeatsService {
 	return &SeatsService{db: db}
 }
-func (s *SeatsService) GetSeats(ctx context.Context, eventID string, categoryName string, sectionName string) ([]models.Seat, error) {
+func (s *SeatsService) GetSeats(ctx context.Context, eventID string, sectionName string) ([]models.Seat, error) {
 	filter := bson.M{
-		"eventId":  eventID,
-		"category": categoryName,
-		"section":  sectionName,
+		"eventId": eventID,
+		"section": sectionName,
 	}
 	cursor, err := s.db.Find(ctx, filter)
 	if err != nil {

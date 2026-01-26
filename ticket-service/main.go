@@ -29,8 +29,11 @@ func main() {
 	sectionService := services.NewSectionService(dependencies.TicketCol)
 	sectionHandler := handlers.NewSectionHandler(sectionService.(*services.SectionService))
 
-	seatService := services.NewSeatLockService(dependencies.RedisClient)
-	seatHandler := handlers.NewSeatLockHandler(seatService)
+	seatService := services.NewSeatsService(dependencies.TicketCol)
+	seatHandler := handlers.NewSeatsHandler(seatService.(*services.SeatsService))
+
+	seatLockService := services.NewSeatLockService(dependencies.RedisClient)
+	seatLockHandler := handlers.NewSeatLockHandler(seatLockService)
 
 	authMiddleware := handlers.NewAuthMiddleware(dependencies.JWTSecret)
 
@@ -39,7 +42,8 @@ func main() {
 	{
 		tickets.GET("/categories/:id", categoryHandler.ListAllCategories)
 		tickets.GET("/events/:eventId/categories/:category", sectionHandler.ListAllSection)
-		tickets.POST("seats/lock", seatHandler.HandleLockSeat)
+		tickets.GET("/events/:eventId/sections/:sectionName/seats", seatHandler.ListAllSeats)
+		tickets.POST("seats/lock", seatLockHandler.HandleLockSeat)
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())

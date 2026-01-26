@@ -23,10 +23,10 @@ func RegisterTicketsRoutes(r *gin.Engine, cfg config.ServiceConfig) {
 
 			proxy.Forward(cfg.TicketService, targetPath)(c)
 		})
-		auth.GET("/events/:eventId/section/:sectionName/seats", func(c *gin.Context) {
+		auth.GET("/events/:eventId/sections/:sectionName/seats", func(c *gin.Context) {
 			eventId := c.Param("eventId")
 			sectionName := c.Param("sectionName")
-			targetPath := "/tickets/events/" + eventId + "/section/" + sectionName + "/seats"
+			targetPath := "/tickets/events/" + eventId + "/sections/" + sectionName + "/seats"
 
 			proxy.Forward(cfg.TicketService, targetPath)(c)
 		})
