@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import axiosInstance from "../Components/interceptor";
-import Seat from "../Components/Seat";
+import axiosInstance from "./interceptor";
+import Seat from "./Seat";
 import toast from "react-hot-toast";
 
 const SeatSelection = () => {
