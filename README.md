@@ -4,6 +4,8 @@
 
 This is a scalable, microservices-based ticketing platform designed to handle high-concurrency booking scenarios. Built with **Go (Golang)** and **Kafka**, it utilizes an Event-Driven Architecture to decouple core services and ensure data consistency across distributed systems.
 
+**Key Highlight:** The system implements a robust **Distributed Locking Mechanism** using Redis to handle the "Thundering Herd" problem during high-demand ticket sales, ensuring that no seat is double-booked even when thousands of users click simultaneously.
+
 ---
 
 ## Tech Stack
@@ -11,8 +13,8 @@ This is a scalable, microservices-based ticketing platform designed to handle hi
 - **Backend:** Go (Golang), Gin Framework
 - **Frontend:** React.js, Tailwind CSS
 - **Messaging:** Apache Kafka, Outbox Pattern
-- **Database:** MongoDB (Event/Ticket Data), Redis (Planned for Locking)
-- **Infrastructure:** Docker, Railway/Render (Free Tier Deployment)
+- **Database:** MongoDB (Event/Ticket Data), **Redis (Active Distributed Locking)**
+- **Infrastructure:** Docker, Railway/Render (Cloud Deployment)
 - **Architecture:** Microservices, API Gateway, Centralized Config Module
 
 ---
@@ -21,7 +23,7 @@ This is a scalable, microservices-based ticketing platform designed to handle hi
 
 The system is composed of loose-coupled microservices communicating via REST (Synchronous) and Kafka (Asynchronous).
 
-### **High-Level Design**
+### **1. High-Level Data Flow**
 
 ```mermaid
 graph TD
@@ -50,6 +52,37 @@ graph TD
 
 ```
 
+### **2. Concurrency Control: The Seat Locking Flow**
+
+To handle race conditions (e.g., 500 users trying to book "Seat A1" at the exact same millisecond), the system uses a **Redis-First** approach.
+
+```mermaid
+sequenceDiagram
+    participant User as React Client
+    participant API as Ticket Service
+    participant Redis as Redis Cache
+    participant DB as MongoDB
+
+    Note over User, Redis: Step 1: User Selects a Seat
+    User->>API: POST /seats/lock (SeatID)
+
+    Note over API, Redis: Step 2: Atomic Lock Acquisition
+    API->>Redis: SETNX lock:seat:{id} (TTL=10m)
+
+    alt Lock Acquired (Success)
+        Redis-->>API: OK (1)
+        API->>Redis: Add to User's Temp Cart
+        API-->>User: 200 OK (Seat Turns Green)
+    else Lock Failed (Already Taken)
+        Redis-->>API: NULL (0)
+        API-->>User: 409 Conflict (Error: "Seat just booked")
+        User->>User: Revert Seat Color to White
+    end
+
+```
+
+---
+
 ### **Key Architectural Patterns**
 
 1. **Transactional Outbox Pattern:**
@@ -58,16 +91,18 @@ graph TD
 - Instead, event data is written to an `outbox` collection within the same database transaction.
 - A connector/relay then streams these records to Kafka, guaranteeing **At-Least-Once delivery** to the Ticket Service.
 
-2. **Centralized API Gateway:**
+2. **Redis Distributed Locking (Concurrency Core):**
+
+- **Problem:** Database transactions are too slow to handle thousands of concurrent "book" requests.
+- **Solution:** We intercept the booking request at the cache level.
+- Using Redis `SETNX` (Set if Not Exists), we create an **Atomic Lock**. Only one request can succeed in setting this key.
+- All subsequent requests fail instantly without hitting the primary database, protecting the database from load and ensuring zero double-bookings.
+
+3. **Centralized API Gateway:**
 
 - Acts as the single entry point for all client requests.
 - Handles routing to appropriate downstream services (Auth, Event, Ticket).
 - Internal microservices communicate via the Gateway URL to abstract service discovery.
-
-3. **Shared 'Common' Module:**
-
-- A custom Go library that standardizes Kafka configuration, Producers, and Consumers.
-- Ensures consistent error handling and connection logic across all microservices.
 
 ---
 
@@ -81,44 +116,40 @@ graph TD
 ### **2. Event & Ticket Management**
 
 - **API-First Design:** Events are created via secure API endpoints.
-- **Async Ticket Generation:**
-- When an Admin creates an Event, the **Event Service** publishes a message via the Outbox pattern.
+- **Async Ticket Generation:** - When an Admin creates an Event, the **Event Service** publishes a message via the Outbox pattern.
 - The **Ticket Service** consumes this event and asynchronously generates the inventory (Categories, Sections, Seats).
 
-### **3. Booking Flow (Discovery)**
+### **3. Smart Booking Flow**
 
-- Hierarchical browsing of inventory:
-- **Select Event** -> **View Categories** -> **View Sections** -> **Select Seats** (In Progress).
-
-- Efficient aggregation of seat availability status.
+- **Real-Time Locking:** As users select seats on the React frontend, individual calls are made to "reserve" the seat in Redis for a specific duration (e.g., 10 minutes).
+- **Cart Validation:** Before proceeding to checkout, the system validates that the user still holds valid locks for all selected seats.
+- **Optimistic UI:** The frontend assumes success but instantly reverts the UI if the backend reports a lock conflict.
 
 ---
 
 ## Project Roadmap & Status
 
-| Feature / Module        | Status      | Technical Detail                                 |
-| ----------------------- | ----------- | ------------------------------------------------ |
-| **User Authentication** | Completed   | JWT, Refresh Rotation, Middleware                |
-| **API Gateway**         | Completed   | Reverse Proxy, Request Routing                   |
-| **Event Creation**      | Completed   | MongoDB Transaction, Outbox Pattern              |
-| **Ticket Generation**   | Completed   | Kafka Consumer Group                             |
-| **Inventory Browsing**  | Completed   | Categories & Sections APIs                       |
-| **Seat Map UI**         | In Progress | HTML5 Canvas / Grid Rendering                    |
-| **Concurrency Control** | Planned     | Redis Distributed Locks + Pessimistic DB Locking |
-| **Payments**            | Planned     | Mocked Payment Gateway                           |
+| Feature / Module        | Status        | Technical Detail                       |
+| ----------------------- | ------------- | -------------------------------------- |
+| **User Authentication** | Completed     | JWT, Refresh Rotation, Middleware      |
+| **API Gateway**         | Completed     | Reverse Proxy, Request Routing         |
+| **Event Creation**      | Completed     | MongoDB Transaction, Outbox Pattern    |
+| **Ticket Generation**   | Completed     | Kafka Consumer Group                   |
+| **Inventory Browsing**  | Completed     | Categories & Sections APIs             |
+| **Seat Locking**        | **Completed** | **Redis SETNX (Atomic Locking) + TTL** |
+| **Seat Map UI**         | In Progress   | React Grid, Optimistic Updates         |
+| **Payments**            | Planned       | Mocked Payment Gateway                 |
 
 ---
 
-##  Microservices Overview
+## Microservices Overview
 
 This system relies on the following distributed services:
 
-| Service Name | Type | Key Responsibility |
-| :--- | :--- | :--- |
-| **`api-gateway`** | Entry Point | Reverse Proxy, JWT Validation, Request Routing |
-| **`auth-service`** | Core Domain | User Identity, Access/Refresh Token Management |
-| **`event-service`** | Core Domain | Event Metadata, Outbox Transaction Handling |
-| **`ticket-service`** | Consumer | Kafka Consumer, Inventory Generation, Booking Logic |
-| **`common-module`** | Library | Shared Kafka Configs, Middleware, Error Constants |
-
-
+| Service Name         | Type        | Key Responsibility                                  |
+| -------------------- | ----------- | --------------------------------------------------- |
+| **`api-gateway`**    | Entry Point | Reverse Proxy, JWT Validation, Request Routing      |
+| **`auth-service`**   | Core Domain | User Identity, Access/Refresh Token Management      |
+| **`event-service`**  | Core Domain | Event Metadata, Outbox Transaction Handling         |
+| **`ticket-service`** | Consumer    | Kafka Consumer, Redis Locking, Inventory Management |
+| **`common-module`**  | Library     | Shared Kafka Configs, Middleware, Error Constants   |
