@@ -15,7 +15,7 @@ func NewSeatsHandler(service *services.SeatsService) *SeatsHandler {
 }
 func (h *SeatsHandler) ListAllSeats(c *gin.Context) {
 	eventID := c.Param("eventId")
-	sectionName := c.Param("section")
+	sectionName := c.Param("sectionName")
 	seats, err := h.service.GetSeats(c.Request.Context(), eventID, sectionName)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})

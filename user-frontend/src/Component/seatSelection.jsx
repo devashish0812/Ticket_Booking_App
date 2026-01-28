@@ -1,4 +1,10 @@
-import React, { useEffect, useState, useMemo, useCallback } from "react";
+import React, {
+  useEffect,
+  useState,
+  useMemo,
+  useCallback,
+  useRef,
+} from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axiosInstance from "./interceptor";
 import Seat from "./Seat";
@@ -13,6 +19,12 @@ const SeatSelection = () => {
   const [seats, setSeats] = useState([]);
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const selectedSeatsRef = useRef(selectedSeats);
+
+  useEffect(() => {
+    selectedSeatsRef.current = selectedSeats;
+  }, [selectedSeats]);
 
   useEffect(() => {
     const fetchSeats = async () => {
@@ -52,40 +64,42 @@ const SeatSelection = () => {
     return finalSortedSeats;
   }, [seats]);
 
-  const handleToggleSeat = useCallback(
-    async (seat) => {
-      const isAlreadySelected = selectedSeats.some((s) => s.id === seat.id);
+  const handleToggleSeat = useCallback(async (seat) => {
+    const currentSelectedSeats = selectedSeatsRef.current;
+    const isAlreadySelected = currentSelectedSeats.some(
+      (s) => s.id === seat.id
+    );
 
-      if (isAlreadySelected) {
-        setSelectedSeats((prev) => prev.filter((s) => s.id !== seat.id));
-        return;
-      }
+    if (isAlreadySelected) {
+      setSelectedSeats((prev) => prev.filter((s) => s.id !== seat.id));
+      return;
+    }
 
-      if (selectedSeats.length >= 6) {
-        alert("Max 6 seats allowed");
-        return;
-      }
+    if (currentSelectedSeats.length >= 6) {
+      toast.error("Max 6 seats allowed", {
+        style: { borderRadius: "10px", background: "#333", color: "#fff" },
+      });
+      return;
+    }
 
-      setSelectedSeats((prev) => [...prev, seat]);
+    setSelectedSeats((prev) => [...prev, seat]);
 
-      try {
-        await axiosInstance.post("/tickets/seats/lock", { seatId: seat.id });
-      } catch (error) {
-        setSelectedSeats((prev) => prev.filter((s) => s.id !== seat.id));
+    try {
+      await axiosInstance.post("/tickets/seats/lock", { seatId: seat.id });
+    } catch (error) {
+      setSelectedSeats((prev) => prev.filter((s) => s.id !== seat.id));
 
-        setSeats((prevSeats) =>
-          prevSeats.map((s) =>
-            s.id === seat.id ? { ...s, status: "booked" } : s
-          )
-        );
+      setSeats((prevSeats) =>
+        prevSeats.map((s) =>
+          s.id === seat.id ? { ...s, status: "booked" } : s
+        )
+      );
 
-        toast.error("Missed it! This seat was just booked.", {
-          style: { borderRadius: "10px", background: "#333", color: "#fff" },
-        });
-      }
-    },
-    [selectedSeats]
-  );
+      toast.error("Missed it! This seat was just booked.", {
+        style: { borderRadius: "10px", background: "#333", color: "#fff" },
+      });
+    }
+  }, []);
 
   const handleProceed = () => {
     navigate("/checkout", {
