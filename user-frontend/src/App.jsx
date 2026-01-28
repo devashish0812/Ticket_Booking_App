@@ -7,6 +7,7 @@ import EventDetails from "./Component/eventDetails";
 import CategorySelection from "./Component/categorySelection";
 import SectionSelection from "./Component/sectionSelection";
 import SeatSelection from "./Component/seatSelection";
+import { Toaster } from "react-hot-toast";
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -35,6 +36,7 @@ function App() {
   return (
     <>
       <BrowserRouter>
+        <Toaster position="top-center" reverseOrder={false} />
         <Routes>
           <Route
             element={
