@@ -35,6 +35,12 @@ func main() {
 	authMiddleware := handlers.NewAuthMiddleware(mongoCfg.JWTSecret)
 
 	r := gin.Default()
+	r.GET("/health", func(c *gin.Context) { // for pinging the service health
+		c.JSON(200, gin.H{
+			"status":  "alive",
+			"service": "event-service",
+		})
+	})
 	events := r.Group("/events", authMiddleware.RequireAuth())
 	{
 		events.POST("/create", eventHandler.CreateEvent)
@@ -43,7 +49,13 @@ func main() {
 		events.GET("/getallForOrg", listAllEventForOrgHandler.ListEventsForOrg)
 	}
 
-	outboxService := services.NewOutboxService(mongoCfg)
+	ticketTopic := os.Getenv("KAFKA_TOPIC")
+	if ticketTopic == "" {
+		ticketTopic = "ticketDetails.created"
+	}
+
+	outboxService := services.NewOutboxService(mongoCfg, ticketTopic)
+
 	ctx, cancel := context.WithCancel(context.Background())
 	go func() {
 		log.Println("Outbox worker started...")
@@ -57,6 +69,14 @@ func main() {
 		<-sigChan
 		log.Println("Shutdown signal received, stopping outbox worker...")
 		cancel()
+
+		// CHANGED: Explicitly close the Kafka connection on shutdown
+		if err := outboxService.Close(); err != nil {
+			log.Printf("Error closing outbox service: %v", err)
+		} else {
+			log.Println("Outbox service closed successfully")
+		}
+
 		time.Sleep(2 * time.Second)
 		os.Exit(0)
 	}()

@@ -56,3 +56,5 @@ require (
 	golang.org/x/sync v0.16.0
 	golang.org/x/text v0.27.0 // indirect
 )
+
+replace github.com/devashish0812/Ticket_Booking_App/common => ../common

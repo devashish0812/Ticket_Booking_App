@@ -15,11 +15,20 @@ type Producer struct {
 }
 
 func NewProducer(cfg *Config) *Producer {
-	writer := &kafka.Writer{
-		Addr:         kafka.TCP(cfg.Brokers...),
-		BatchTimeout: 100 * time.Millisecond,
-		RequiredAcks: kafka.RequireAll,
+	dialer := &kafka.Dialer{
+		Timeout:   10 * time.Second,
+		DualStack: true,
+		TLS:       cfg.TLS,
 	}
+
+	writer := kafka.NewWriter(kafka.WriterConfig{
+		Brokers:      cfg.Brokers,
+		Dialer:       dialer,
+		BatchTimeout: 100 * time.Millisecond,
+		RequiredAcks: int(kafka.RequireAll),
+		Balancer:     &kafka.LeastBytes{},
+	})
+
 	return &Producer{writer: writer}
 }
 
@@ -40,10 +49,10 @@ func (p *Producer) Publish(topic string, event interface{}) error {
 	for i := 0; i < retries; i++ {
 		err := p.writer.WriteMessages(context.Background(), msg)
 		if err == nil {
-			log.Printf(" Event published to topic '%s'\n", topic)
+			log.Printf("Event published to topic '%s'\n", topic)
 			return nil
 		}
-		log.Printf(" Publish failed (try %d/%d): %v", i+1, retries, err)
+		log.Printf("Publish failed (try %d/%d): %v", i+1, retries, err)
 		time.Sleep(backoff)
 		backoff *= 2
 	}

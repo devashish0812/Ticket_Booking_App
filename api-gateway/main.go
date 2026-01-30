@@ -19,7 +19,12 @@ func main() {
 		"http://localhost:3000":                    true,
 		"https://user-frontend-kappa.vercel.app":   true,
 	}
-
+	r.GET("/health", func(c *gin.Context) { // for pinging the service health
+		c.JSON(200, gin.H{
+			"status":  "alive",
+			"service": "api-gateway",
+		})
+	})
 	r.Use(cors.New(cors.Config{
 		AllowOriginFunc: func(origin string) bool {
 			_, ok := allowedOrigins[origin]

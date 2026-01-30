@@ -15,18 +15,31 @@ import (
 
 type OutboxService interface {
 	StartWorker(ctx context.Context, id string)
+	Close() error
 }
 
 type outboxService struct {
-	con *config.MongoConfig
+	con      *config.MongoConfig
+	producer *kafka.Producer
+	topic    string
 }
 
-func NewOutboxService(con *config.MongoConfig) OutboxService {
-	return &outboxService{con: con}
+func NewOutboxService(con *config.MongoConfig, topic string) OutboxService {
+	cfg := kafka.LoadConfig()
+	producer := kafka.NewProducer(cfg)
+
+	return &outboxService{
+		con:      con,
+		producer: producer,
+		topic:    topic,
+	}
+}
+
+func (s *outboxService) Close() error {
+	return s.producer.Close()
 }
 
 func (s *outboxService) StartWorker(ctx context.Context, id string) {
-	//ticker := time.NewTicker(5 * time.Minute)
 
 	ticker := time.NewTicker(30 * time.Second)
 	defer ticker.Stop()
@@ -38,7 +51,6 @@ func (s *outboxService) StartWorker(ctx context.Context, id string) {
 			return
 		case <-ticker.C:
 			events, err := s.findPendingEvents(ctx)
-			// event here means outbox events
 			if err != nil {
 				log.Println("Error reading outbox:", err)
 				continue
@@ -67,7 +79,6 @@ func (s *outboxService) StartWorker(ctx context.Context, id string) {
 }
 
 func (s *outboxService) findPendingEvents(ctx context.Context) ([]models.OutboxEvent, error) {
-	// Mongo query: find documents where processed = false
 	timeoutCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
@@ -88,7 +99,6 @@ func (s *outboxService) findPendingEvents(ctx context.Context) ([]models.OutboxE
 }
 
 func (s *outboxService) markAsPublished(ctx context.Context, id string) error {
-	// Mongo update: set status = "published"
 	timeoutCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 	collection := s.con.OutboxCol
@@ -101,10 +111,8 @@ func (s *outboxService) markAsPublished(ctx context.Context, id string) error {
 	log.Println("Event Status Updated in the DB", id)
 	return nil
 }
+
 func (s *outboxService) publishWithRetry(event models.OutboxEvent) error {
-	cfg := kafka.LoadConfig()
-	producer := kafka.NewProducer(cfg)
-	defer producer.Close()
 	message := struct {
 		EventID string          `json:"eventId"`
 		Payload []models.Ticket `json:"payload"`
@@ -113,7 +121,7 @@ func (s *outboxService) publishWithRetry(event models.OutboxEvent) error {
 		Payload: event.Payload,
 	}
 
-	err := producer.Publish("ticketDetails.created", message)
+	err := s.producer.Publish(s.topic, message)
 	if err != nil {
 		log.Println("Outbox publish failed, will retry later:", err)
 		return err

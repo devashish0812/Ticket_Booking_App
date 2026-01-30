@@ -38,6 +38,12 @@ func main() {
 	authMiddleware := handlers.NewAuthMiddleware(dependencies.JWTSecret)
 
 	r := gin.Default()
+	r.GET("/health", func(c *gin.Context) { // for pinging the service health
+		c.JSON(200, gin.H{
+			"status":  "alive",
+			"service": "ticket-service",
+		})
+	})
 	tickets := r.Group("/tickets", authMiddleware.RequireAuth())
 	{
 		tickets.GET("/categories/:id", categoryHandler.ListAllCategories)
