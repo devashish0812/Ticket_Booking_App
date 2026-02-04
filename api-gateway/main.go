@@ -3,6 +3,7 @@ package main
 import (
 	"api-gateway/config"
 	"api-gateway/routes"
+	"os"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -44,5 +45,8 @@ func main() {
 	routes.RegisterTicketsRoutes(r, cfg)
 
 	// Run Gateway
-	r.Run(":8081") // Gateway will run on port 8081
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8081" // Default for local development
+	}
 }

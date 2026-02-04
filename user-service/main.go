@@ -28,7 +28,12 @@ func main() {
 
 	// 3) Routes
 	r := gin.Default()
-
+	r.GET("/health", func(c *gin.Context) { // for pinging the service health
+		c.JSON(200, gin.H{
+			"status":  "alive",
+			"service": "user-service",
+		})
+	})
 	users := r.Group("/users")
 	{
 		users.POST("/signup", userHandler.Signup)

@@ -39,7 +39,7 @@ require (
 )
 
 require (
-	github.com/devashish0812/Ticket_Booking_App/common v0.1.5
+	github.com/devashish0812/Ticket_Booking_App/common v0.1.6
 	github.com/gin-gonic/gin v1.11.0
 	github.com/golang-jwt/jwt/v5 v5.3.0
 	github.com/golang/snappy v0.0.4 // indirect
@@ -57,4 +57,4 @@ require (
 	golang.org/x/text v0.27.0 // indirect
 )
 
-replace github.com/devashish0812/Ticket_Booking_App/common => ../common
+//replace github.com/devashish0812/Ticket_Booking_App/common => ../common
