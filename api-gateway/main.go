@@ -3,6 +3,7 @@ package main
 import (
 	"api-gateway/config"
 	"api-gateway/routes"
+	"log"
 	"os"
 	"time"
 
@@ -48,5 +49,8 @@ func main() {
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8081" // Default for local development
+	}
+	if err := r.Run("0.0.0.0:" + port); err != nil {
+		log.Fatal(err)
 	}
 }

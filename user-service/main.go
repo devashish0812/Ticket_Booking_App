@@ -45,7 +45,7 @@ func main() {
 	if port == "" {
 		port = "8082" // fallback for local
 	}
-	if err := r.Run(":" + port); err != nil {
+	if err := r.Run("0.0.0.0:" + port); err != nil {
 		log.Fatal(err)
 	}
 }
